@@ -11,9 +11,13 @@ import (
 )
 
 const (
+	HistoryPath = ""
+
+	BookmarksPath = "Bookmarks"
+
 	HistoryRecordCount = 30_000
 
-	TargetURL = ""
+	TargetURLs = ""
 
 	InitialID = 300_000
 
@@ -67,7 +71,7 @@ type MetaInfo struct {
 }
 
 func main() {
-	historyRecords, err := GetHistoryRecords("")
+	historyRecords, err := GetHistoryRecords(HistoryPath)
 	if err != nil {
 		fmt.Println(err)
 
@@ -88,7 +92,7 @@ func main() {
 		return
 	}
 
-	bookmarks, err := GetBookmarks("Bookmarks")
+	bookmarks, err := GetBookmarks(BookmarksPath)
 	if err != nil {
 		fmt.Println(err)
 
@@ -102,7 +106,7 @@ func main() {
 		return
 	}
 
-	err = SaveBookmarks("Bookmarks-01", bookmarks)
+	err = SaveBookmarks(BookmarksPath, bookmarks)
 	if err != nil {
 		fmt.Println(err)
 
@@ -131,9 +135,15 @@ func GetHistoryRecords(filePath string) ([]HistoryRecord, error) {
 func ParseHistoryRecords(historyRecords []HistoryRecord) ([]HistoryRecord, error) {
 	handledHistoryRecords := make([]HistoryRecord, 0, len(historyRecords))
 
+	URLs := strings.Split(TargetURLs, ",")
+
 	for _, historyRecord := range historyRecords {
-		if strings.Contains(historyRecord.URL, TargetURL) {
-			handledHistoryRecords = append(handledHistoryRecords, historyRecord)
+		for _, URL := range URLs {
+			if strings.Contains(historyRecord.URL, URL) {
+				handledHistoryRecords = append(handledHistoryRecords, historyRecord)
+
+				break
+			}
 		}
 	}
 
